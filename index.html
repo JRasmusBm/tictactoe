@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <style>
+      main {
+        display: grid;
+        height: min(80vw, 80vh);
+        width: min(80vw, 80vh);
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(3, 1fr);
+        --cell-border: #fff;
+      }
+
+      button {
+        border: 1px solid var(--cell-border);
+        font-size: 5em;
+      }
+
+      button:focus {
+        outline: none;
+        border: 3px solid var(--cell-border);
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Tic Tac Toe</h1>
+    <main></main>
+    <h2></h2>
+
+    <script>
+      const player1 = "X";
+      const player2 = "O";
+
+      const gameData = {
+        currentPlayer: player1,
+        moves: 0,
+        winner: null,
+        gameOver: false,
+        board: Array.from({ length: 9 }, () => ""),
+      };
+
+      function switchTurn() {
+        if (gameData.currentPlayer === player1) {
+          gameData.currentPlayer = player2;
+        } else {
+          gameData.currentPlayer = player1;
+        }
+      }
+
+      function updateBoard() {
+        squares.forEach((square, index) => {
+          square.textContent = gameData.board[index];
+        });
+      }
+
+      function move(index) {
+        if (gameData.board[index] || gameData.winner) {
+          return;
+        }
+
+        gameData.board[index] = gameData.currentPlayer;
+        gameData.moves += 1;
+      }
+
+      function checkIfGameOver() {
+        const winningPositions = [
+          [0, 1, 2],
+          [3, 4, 5],
+          [6, 7, 8],
+          [0, 3, 6],
+          [1, 4, 7],
+          [2, 5, 8],
+          [0, 4, 8],
+          [2, 4, 6],
+        ];
+
+        return !winningPositions.every((winningPosition, index) => {
+          const row = [
+            gameData.board[winningPosition[0]],
+            gameData.board[winningPosition[1]],
+            gameData.board[winningPosition[2]],
+          ];
+
+          if (row[0] === player1 && row[1] === player1 && row[2] === player1) {
+            gameData.gameOver = true;
+            gameData.winner = player1;
+          }
+
+          if (row[0] === player2 && row[1] === player2 && row[2] === player2) {
+            gameData.gameOver = true;
+            gameData.winner = player2;
+          }
+
+          if (gameData.board.every((val) => val)) {
+            gameData.gameOver = true;
+          }
+
+          return !gameData.gameOver;
+        });
+      }
+
+      function updateResult() {
+        if (!gameData.gameOver) {
+          return;
+        }
+
+        if (gameData.winner === player1) {
+          result.textContent = `Player ${player1} won!`;
+        } else if (gameData.winner === player2) {
+          result.textContent = `Player ${player2} won!`;
+        } else {
+          result.textContent = `Draw!`;
+        }
+        result.textContent += " Refresh to play again!";
+      }
+
+      const result = document.querySelector("h2");
+
+      const board = document.querySelector("main");
+      const squares = Array.from({ length: 9 }, () => {
+        const square = document.createElement("button");
+
+        board.appendChild(square);
+
+        return square;
+      });
+
+      squares.forEach((square, index) => {
+        square.addEventListener("click", () => {
+          move(index);
+          switchTurn();
+          updateBoard();
+          checkIfGameOver();
+          updateResult();
+        });
+      });
+    </script>
+  </body>
+</html>
